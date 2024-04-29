@@ -1,13 +1,6 @@
+// App.vue
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-// import Parse from 'parse/dist/parse.min.js';
-
-// Parse.initialize(
-//   'jFl1QQlvXYiliMOKltV2Wo5TWDowO5UQfRj4Iyp2',
-//   'zDlMbHofpO5SecuqO1UU58Pxqxr9tYne74eCkdvr'
-// );
-
-// Parse.serverURL = 'https://parseapi.back4app.com/';
 </script>
 
 <template>

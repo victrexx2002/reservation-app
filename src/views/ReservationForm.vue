@@ -15,21 +15,24 @@
 
 <script setup>
 import { ref } from 'vue';
-import Parse from 'parse/dist/parse.min.js'
+import Parse from 'parse/dist/parse.min.js';
 
 const reservation = ref({
   name: '',
   email: '',
   date: '',
   time: '',
-  phoneNumber: ''
+  phoneNumber: '',
 });
 
 const submitReservation = async () => {
   try {
+    // Format the reservation details
+    const reservationDetails = `Name: ${reservation.value.name}, Email: ${reservation.value.email}, Date: ${reservation.value.date}, Time: ${reservation.value.time}, Phone: ${reservation.value.phoneNumber}`;
+
     const availabilityResult = await Parse.Cloud.run('checkAvailability', {
       date: reservation.value.date,
-      time: reservation.value.time
+      time: reservation.value.time,
     });
 
     if (availabilityResult.available) {
@@ -37,21 +40,21 @@ const submitReservation = async () => {
         ...reservation.value,
         date: {
           __type: 'Date',
-          iso: new Date(reservation.value.date + 'T' + reservation.value.time).toISOString()
-        }
+          iso: new Date(reservation.value.date + 'T' + reservation.value.time).toISOString(),
+        },
       });
 
       if (creationResult) {
-        await Parse.Cloud.run('sendWhatsAppConfirmation', {
-          to: reservation.value.phoneNumber,
-          reserveeName: reservation.value.name, 
-          body: 'Your reservation has been confirmed.' 
+        // Send WhatsApp confirmation message along with the formatted reservation details
+        const messageResult = await Parse.Cloud.run('sendWhatsAppConfirmation', {
+          to: reservation.value.phoneNumber, // E.164 phone number format
+          reserveeName: reservation.value.name,
+          reservationDetails: reservationDetails, // Include formatted reservation details in the message
         });
-        
-        alert('Reservation created and confirmation has been sent via WhatsApp.');
+        alert('Reservation created: ' + messageResult);
       }
     } else {
-      alert('Sorry, the chosen date and time are not available.');
+      alert('Sorry, the chosen date and time are already booked.');
     }
   } catch (error) {
     console.error('Error creating reservation:', error);
